@@ -1,5 +1,14 @@
 import { lazy, Suspense, useState } from 'react';
 import { useConfig, type Legs, type Upholstery } from './store/useConfig';
+import { ArButton } from './ar/ArButton';
+
+// ?debug: test scripts can export the AR model and inspect it
+if (new URLSearchParams(window.location.search).has('debug')) {
+  (window as unknown as { __kavraExportAR: () => Promise<number[]> }).__kavraExportAR = async () => {
+    const { exportChairGLB } = await import('./ar/exportChair');
+    return Array.from(new Uint8Array(await exportChairGLB()));
+  };
+}
 
 const Scene = lazy(() => import('./scene/Scene'));
 
@@ -50,6 +59,7 @@ export default function App() {
         <h1>Lounge 01</h1>
         <Choice legend="Upholstery" options={UPHOLSTERY} value={upholstery} onChange={setUpholstery} />
         <Choice legend="Legs" options={LEGS} value={legs} onChange={setLegs} />
+        <ArButton sceneReady={ready} />
         {debug && <p className="badge" data-backend={backend}>Renderer: {backend}</p>}
       </aside>
     </div>

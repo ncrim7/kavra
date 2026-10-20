@@ -131,6 +131,68 @@ h1 {
   accent-color: var(--ink);
 }
 
+.ar-cta {
+  min-height: 48px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--ink);
+  color: var(--bg);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.ar-cta:disabled {
+  background: var(--line);
+  color: var(--muted);
+  cursor: default;
+}
+
+/* the AR model's viewer: alive in the page, never seen */
+.ar-viewer {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.qr {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  background: rgb(35 33 31 / 0.4);
+}
+
+.qr__card {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  max-width: 300px;
+  padding: 28px;
+  border-radius: 16px;
+  background: var(--bg);
+  text-align: center;
+  font-size: 14px;
+}
+
+.qr__card p {
+  margin: 0;
+}
+
+.link {
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .badge {
   margin: 0;
   font-size: 12px;

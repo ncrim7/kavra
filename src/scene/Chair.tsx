@@ -1,8 +1,9 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useLoader } from '@react-three/fiber';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
-import { BufferAttribute, BufferGeometry, Mesh } from 'three/webgpu';
+import { BufferAttribute, BufferGeometry, Mesh, type Group } from 'three/webgpu';
+import { setChair } from '../ar/registry';
 import { useConfig } from '../store/useConfig';
 import { ashMaterial, boucleMaterial, brassMaterial, leatherMaterial } from './materials';
 
@@ -51,9 +52,16 @@ export function Chair() {
   );
   useEffect(() => () => Object.values(materials).forEach((m) => m.dispose()), [materials]);
 
+  // the AR export reads the chair straight from the scene
+  const group = useRef<Group>(null);
+  useEffect(() => {
+    setChair(group.current);
+    return () => setChair(null);
+  }, []);
+
   const cover = materials[upholstery];
   return (
-    <group name="Chair">
+    <group name="Chair" ref={group}>
       <mesh name="Shell" geometry={parts.Shell} material={cover} castShadow receiveShadow />
       <mesh name="Seat" geometry={parts.Seat} material={cover} castShadow receiveShadow />
       <mesh name="Legs" geometry={parts.Legs} material={materials[legs]} castShadow />

@@ -25,6 +25,8 @@ node scripts/shoot.mjs   # screenshot + behaviour check against the preview serv
   `scripts/prepare-model.mjs`: converted to metres, split into shell, seat and legs, sewn-in tag
   removed, new UVs, original materials replaced.
 - Textures: [Poly Haven](https://polyhaven.com) (CC0) — Curly Teddy Natural (recoloured), Brown Leather, Ash Veneer.
+- AR: [`<model-viewer>`](https://modelviewer.dev) 4.4.0 by Google, Apache-2.0 (self-contained build in
+  `public/vendor/`, licence alongside).
 - Font: Instrument Sans (SIL Open Font License), via Google Fonts.
 
 KAVRA is a fictional brand, made as a design study.
