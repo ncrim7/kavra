@@ -24,8 +24,9 @@ export function ArButton({ sceneReady }: { sceneReady: boolean }) {
   // desktop: fetch the QR encoder while idle, so the click shows the code at once
   useEffect(() => {
     if (platform !== 'desktop' || !sceneReady) return;
-    const idle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 1500));
-    idle(() => void import('qrcode'));
+    const prefetch = () => void import('qrcode');
+    if (window.requestIdleCallback) window.requestIdleCallback(prefetch, { timeout: 2000 });
+    else window.setTimeout(prefetch, 1500);
   }, [platform, sceneReady]);
 
   useEffect(() => {

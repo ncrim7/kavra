@@ -206,6 +206,13 @@ h1 {
     height: auto;
   }
 
+  /* the AR button stays within thumb reach while the options scroll */
+  .ar-cta {
+    position: sticky;
+    bottom: 16px;
+    box-shadow: 0 6px 24px rgb(35 33 31 / 0.18);
+  }
+
   .panel {
     border-left: 0;
     border-top: 1px solid var(--line);

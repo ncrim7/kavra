@@ -51,6 +51,13 @@ for (const run of runs) {
     }
     await sleep(2500);
     await page.screenshot({ path: `${out}/${tag}-boucle-ash.png` });
+    // at rest the scene must not redraw (frameloop "demand")
+    const frames = () => page.evaluate(() => window.__kavra.frames ?? 0);
+    const before = await frames();
+    await sleep(3000);
+    const idle = (await frames()) - before;
+    console.log(`[${tag}] frames drawn while idle for 3 s: ${idle}`);
+    if (idle > 2) problems.push(`[${tag}] scene keeps redrawing while idle (${idle} frames in 3 s)`);
     // orbit: the chair must stay in frame from another angle
     const box = await page.locator('canvas').boundingBox();
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
@@ -59,6 +66,8 @@ for (const run of runs) {
     await page.mouse.up();
     await sleep(2500);
     await page.screenshot({ path: `${out}/${tag}-orbit.png` });
+    const afterOrbit = await frames();
+    if (afterOrbit - before - idle < 3) problems.push(`[${tag}] orbiting did not redraw the scene`);
     await page.evaluate(() => {
       document.querySelector('input[value="leather"]').click();
       document.querySelector('input[value="brass"]').click();

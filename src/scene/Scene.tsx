@@ -32,17 +32,28 @@ const noEnv = params.has('noenv');
 function Studio() {
   const gl = useThree((s) => s.gl) as unknown as WebGPURenderer;
   const scene = useThree((s) => s.scene);
+  const invalidate = useThree((s) => s.invalidate);
   useEffect(() => {
     const pmrem = new PMREMGenerator(gl);
     const target = pmrem.fromScene(new RoomEnvironment(), 0.04);
     scene.environment = target.texture;
     scene.environmentIntensity = 0.85;
     scene.background = new Color(BACKGROUND);
+    invalidate();
     return () => {
       target.dispose();
       pmrem.dispose();
     };
-  }, [gl, scene]);
+  }, [gl, scene, invalidate]);
+  return null;
+}
+
+/** ?debug: counts rendered frames, so tests can check the scene rests when nothing changes. */
+function FrameCounter() {
+  useFrame(() => {
+    const k = (window as unknown as { __kavra?: { frames?: number } }).__kavra;
+    if (k) k.frames = (k.frames ?? 0) + 1;
+  });
   return null;
 }
 
@@ -64,8 +75,11 @@ function Controls() {
   const aspect = useThree((s) => s.size.width / s.size.height);
   const controls = useThree((s) => s.controls) as OrbitControls | null;
   const set = useThree((s) => s.set);
+  const invalidate = useThree((s) => s.invalidate);
   useEffect(() => {
     const c = new OrbitControls(camera, dom);
+    // the scene draws on demand: every camera move (including damping's glide) asks for a frame
+    c.addEventListener('change', () => invalidate());
     c.target.set(0, FOCUS_Y, 0);
     c.enableDamping = true;
     c.enablePan = false;
@@ -73,7 +87,7 @@ function Controls() {
     c.maxPolarAngle = Math.PI / 2 - 0.05; // never below the floor
     set({ controls: c });
     return () => c.dispose();
-  }, [camera, dom, set]);
+  }, [camera, dom, set, invalidate]);
 
   // Frame the chair for this canvas: on a tall phone canvas the horizontal field of view is the
   // limit, so the camera backs off; zoom limits follow the fitted distance.
@@ -93,15 +107,23 @@ function Controls() {
 
 /** Hands three.js asset-loading progress (model + textures) to the page's loading overlay. */
 function ReportProgress({ onProgress }: { onProgress: (percent: number) => void }) {
+  const invalidate = useThree((s) => s.invalidate);
   useEffect(() => {
     const manager = DefaultLoadingManager;
-    manager.onProgress = (_url, loaded, total) => onProgress(Math.round((loaded / total) * 100));
-    manager.onLoad = () => onProgress(100);
+    // a texture that arrives later (e.g. after switching material) needs a fresh frame to appear
+    manager.onProgress = (_url, loaded, total) => {
+      onProgress(Math.round((loaded / total) * 100));
+      invalidate();
+    };
+    manager.onLoad = () => {
+      onProgress(100);
+      invalidate();
+    };
     return () => {
       manager.onProgress = () => {};
       manager.onLoad = () => {};
     };
-  }, [onProgress]);
+  }, [onProgress, invalidate]);
   return null;
 }
 
@@ -164,6 +186,9 @@ export default function Scene({ onBackend, onProgress }: { onBackend: (name: str
     <div className="scene">
       <Canvas
         key={webgl ? 'webgl' : 'webgpu'}
+        // draw only when something changes: a configurator is still most of the time, and an idle
+        // page shouldn't keep the GPU (or a laptop battery) busy
+        frameloop="demand"
         shadows={noShadow ? false : { type: VSMShadowMap }}
         camera={{ position: [1.5, 1.05, 2.1], fov: 30, near: 0.05, far: 30 }}
         gl={(props) => createRenderer(props as object) as never}
@@ -174,6 +199,7 @@ export default function Scene({ onBackend, onProgress }: { onBackend: (name: str
       >
         <ReportBackend onBackend={onBackend} />
         <ReportProgress onProgress={onProgress} />
+        {params.has('debug') && <FrameCounter />}
         {noEnv ? <color attach="background" args={[BACKGROUND]} /> : <Studio />}
         <Controls />
         {/* A soft, nearly overhead light: the shadow pools under the chair like studio daylight
