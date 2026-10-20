@@ -7,8 +7,13 @@ import { Chair } from './Chair';
 
 const BACKGROUND = '#ece7e0';
 const params = new URLSearchParams(window.location.search);
-/** `?webgl` forces the WebGL 2 backend, to test the fallback on WebGPU-capable browsers. */
-const forceWebGL = params.has('webgl');
+/**
+ * WebGL 2 is the default backend; `?webgpu` opts in to WebGPU. On the dev machine (AMD integrated
+ * GPU) Chrome's WebGPU hung the display adapter hard enough to black out the screen — a driver
+ * timeout no page code can catch or recover from. This scene gains nothing visible from WebGPU,
+ * and the node materials (TSL) run unchanged on both backends.
+ */
+const forceWebGL = !params.has('webgpu');
 // diagnostics: switch off one feature at a time
 const noShadow = params.has('noshadow');
 const noEnv = params.has('noenv');

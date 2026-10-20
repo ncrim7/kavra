@@ -16,7 +16,7 @@ await mkdir(out, { recursive: true });
 // machine a headless WebGPU run hung the GPU that drives the display (black screen, hard reboot).
 // WebGPU is verified by hand in a normal browser.
 const runs = [
-  { name: 'webgl', query: '?debug&webgl', expect: 'WebGL 2', launch: { args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] } },
+  { name: 'webgl', query: '?debug', expect: 'WebGL 2', launch: { args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] } },
 ];
 const viewports = [
   { name: 'desktop', width: 1440, height: 900, isMobile: false },
