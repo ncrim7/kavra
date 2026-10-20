@@ -12,11 +12,11 @@ await mkdir(out, { recursive: true });
 
 // The installed Chrome exposes the real GPU in headless mode (Playwright's bundled headless shell
 // has no WebGPU adapter), so both runs render on hardware.
-// GPU=1 adds the hardware WebGPU run; by default only the software-rendered WebGL 2 path runs,
-// which works on any machine.
+// Software rendering only (SwiftShader). Never point automated runs at the real GPU: on the dev
+// machine a headless WebGPU run hung the GPU that drives the display (black screen, hard reboot).
+// WebGPU is verified by hand in a normal browser.
 const runs = [
   { name: 'webgl', query: '?debug&webgl', expect: 'WebGL 2', launch: { args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader'] } },
-  ...(process.env.GPU ? [{ name: 'webgpu', query: '?debug', expect: 'WebGPU', launch: { channel: 'chrome', args: ['--enable-unsafe-webgpu'] } }] : []),
 ];
 const viewports = [
   { name: 'desktop', width: 1440, height: 900, isMobile: false },
