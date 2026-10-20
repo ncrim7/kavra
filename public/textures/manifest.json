@@ -1,0 +1,29 @@
+{
+  "boucle-ivory": {
+    "source": "curly_teddy_natural",
+    "sourceName": "Curly Teddy Natural",
+    "size": [
+      0.3358,
+      0.3309
+    ],
+    "tint": "#e8e1d3"
+  },
+  "leather-cognac": {
+    "source": "brown_leather",
+    "sourceName": "Brown Leather",
+    "size": [
+      0.4,
+      0.4
+    ],
+    "tint": null
+  },
+  "wood-ash": {
+    "source": "ash_veneer",
+    "sourceName": "Ash Veneer",
+    "size": [
+      1,
+      1
+    ],
+    "tint": null
+  }
+}

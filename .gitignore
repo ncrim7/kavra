@@ -1,0 +1,13 @@
+node_modules
+dist
+*.local
+.vite
+
+# raw downloads, kept out of the repo
+models-raw/
+textures-raw/
+
+# test output
+test-results/
+playwright-report/
+screenshots/
