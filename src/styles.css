@@ -26,10 +26,49 @@ body {
   height: 100svh;
 }
 
-.scene {
+.stage {
   position: relative;
   min-height: 0;
+}
+
+.scene {
+  position: absolute;
+  inset: 0;
   touch-action: none;
+}
+
+.loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 14px;
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  transition:
+    opacity 0.6s ease,
+    visibility 0s linear 0.6s;
+}
+
+.loading p {
+  margin: 0;
+}
+
+.loading__bar {
+  width: 160px;
+  height: 2px;
+  background: var(--ink);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.loading[data-done='true'] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .panel {

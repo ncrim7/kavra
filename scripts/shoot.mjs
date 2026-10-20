@@ -43,8 +43,22 @@ for (const run of runs) {
     const backend = await page.evaluate(() => window.__kavra.backend);
     console.log(`[${tag}] backend ${backend} after ${Date.now() - t0} ms`);
     if (backend !== run.expect) problems.push(`[${tag}] expected ${run.expect}, got ${backend}`);
-    await sleep(6000); // model + textures
+    // the loading overlay must go away once the model and textures are in
+    try {
+      await page.waitForSelector('.loading[data-done="true"]', { state: 'attached', timeout: 60_000 });
+    } catch {
+      problems.push(`[${tag}] loading overlay never finished`);
+    }
+    await sleep(2500);
     await page.screenshot({ path: `${out}/${tag}-boucle-ash.png` });
+    // orbit: the chair must stay in frame from another angle
+    const box = await page.locator('canvas').boundingBox();
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width / 2 + 160, box.y + box.height / 2 + 20, { steps: 10 });
+    await page.mouse.up();
+    await sleep(2500);
+    await page.screenshot({ path: `${out}/${tag}-orbit.png` });
     await page.evaluate(() => {
       document.querySelector('input[value="leather"]').click();
       document.querySelector('input[value="brass"]').click();

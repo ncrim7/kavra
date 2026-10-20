@@ -29,13 +29,22 @@ function Choice<T extends string>({ legend, options, value, onChange }: { legend
 export default function App() {
   const { upholstery, legs, setUpholstery, setLegs } = useConfig();
   const [backend, setBackend] = useState('…');
+  const [progress, setProgress] = useState(0);
   const debug = new URLSearchParams(window.location.search).has('debug');
+  const ready = progress >= 100;
 
   return (
     <div className="app">
-      <Suspense fallback={<div className="scene scene--loading" />}>
-        <Scene onBackend={setBackend} />
-      </Suspense>
+      <div className="stage">
+        <Suspense fallback={null}>
+          <Scene onBackend={setBackend} onProgress={setProgress} />
+        </Suspense>
+        {/* shown until the 3D engine, model and textures have all arrived */}
+        <div className="loading" data-done={ready} aria-hidden={ready}>
+          <p role="status">Preparing your chair · {progress}%</p>
+          <div className="loading__bar" style={{ transform: `scaleX(${progress / 100})` }} />
+        </div>
+      </div>
       <aside className="panel">
         <p className="eyebrow">KAVRA</p>
         <h1>Lounge 01</h1>
