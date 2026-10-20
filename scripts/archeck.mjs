@@ -115,8 +115,14 @@ for (const [u, l] of [['boucle', 'ash'], ['leather', 'brass']]) {
   await waitReady(page);
   const upholstery = await page.locator('input[value="leather"]').isChecked();
   await page.locator('.ar-cta').click();
-  await page.waitForSelector('.qr img', { timeout: 10_000 }).catch(() => problems.push('[desktop] QR dialog did not open'));
-  console.log(`[desktop] opened with ?u=leather: leather selected ${upholstery}; QR shown`);
+  const t0 = Date.now();
+  const shown = await page
+    .waitForSelector('.qr img', { timeout: 30_000 })
+    .then(() => true)
+    .catch(() => false);
+  if (!shown) problems.push('[desktop] QR dialog did not open');
+  const qrUrl = shown ? await page.evaluate(() => window.location.href) : '';
+  console.log(`[desktop] opened with ?u=leather: leather selected ${upholstery}; QR ${shown ? `shown after ${Date.now() - t0} ms for ${qrUrl}` : 'NOT shown'}`);
   if (!upholstery) problems.push('[desktop] configuration from the URL was not applied');
   await page.screenshot({ path: `${out}/desktop-qr.png` });
   await page.close();

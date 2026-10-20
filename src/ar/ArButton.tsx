@@ -21,6 +21,13 @@ export function ArButton({ sceneReady }: { sceneReady: boolean }) {
   const [qr, setQr] = useState<string | null>(null);
   const viewer = useRef<ModelViewerElement | null>(null);
 
+  // desktop: fetch the QR encoder while idle, so the click shows the code at once
+  useEffect(() => {
+    if (platform !== 'desktop' || !sceneReady) return;
+    const idle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 1500));
+    idle(() => void import('qrcode'));
+  }, [platform, sceneReady]);
+
   useEffect(() => {
     if (platform === 'desktop' || !sceneReady) return;
     let cancelled = false;
